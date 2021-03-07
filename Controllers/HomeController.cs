@@ -23,36 +23,27 @@ namespace Paination.Controllers
 
         public IActionResult Index(int pg=1)
         {
+            //pg is the page number the user curently at
+
+            if(pg<1){//dont let user set pg bellow 1
+                pg=1;
+            }
+
             using (var con=new SqlConnection(@"Server=DESKTOP-NIOCFBP;Database=NewDatabaseSample;Trusted_Connection=True;"))
             {
-                var result =con.Query<ExampleTable>("select id,Fullname from NewTableSample").ToList();
-                const int pageSize=10;
-                if(pg<1){
-                    pg=1;
-                }
-                int rescCount=result.Count();
-                var pagin=new Pagin(rescCount,pg,pageSize);
-                int resSkip=(pg-1)*pageSize;
-                var data=result.Skip(resSkip).Take(pagin.PageSize).ToList();
-                ViewBag.Pagin=pagin;
-                return View(data);
+                // if we want serch functunality put it in the query via paramiter from url
+                var result =con.Query<ExampleTable>("select id,Fullname from NewTableSample").ToList(); // get all data
+                
+                int rowCount=result.Count();//count how many records do we have using Linq
+
+                var pagin=new Pagin(rowCount,pg); //create object of Pagin and send row Count and page number
+
+                int resSkip=(pg-1) * pagin.PageSize;//set how much we should offset the records
+                var data=result.Skip(resSkip).Take(pagin.PageSize).ToList(); // this is offset and fetch
+                ViewBag.Pagin=pagin;//we will send this to the view
+                return View(data);//return the offset and fetch that we want
             }
         }
-        // public List<ExampleTable> GetPaginationResult()
-        // {
-        //     using (var con=new SqlConnection(@"Server=DESKTOP-NIOCFBP;Database=NewDatabaseSample;Trusted_Connection=True;"))
-        //     {
-        //         var result =con.Query<ExampleTable>("select * from NewTableSample").ToList();
-        //         return result;
-        //     }
-        // }
-        // public int GetCount()
-        // {
-        //     using (var con=new SqlConnection(@"Server=DESKTOP-NIOCFBP;Database=NewDatabaseSample;Trusted_Connection=True;"))
-        //     {
-        //         return con.ExecuteScalar<int>("select count(id) from NewTableSample");
-        //     }
-        // }
         public IActionResult Privacy()
         {
             return View();

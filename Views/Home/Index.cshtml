@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Pagin pagin=new ();
+    int pageNo=0;
+    if(ViewBag.Pagin!=null)
+    {
+        pagin=ViewBag.Pagin;
+        pageNo=pagin.CurrentPage;
+    } 
+}
+@model List<ExampleTable>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.id</td>
+                <td>@item.FullName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    @if(pagin.TotalPages>0){
+        <ul class="pagination justify-content-end">
+            @if (pagin.CurrentPage>1)
+            {
+                <li class="page-item" >
+                    <a class="page-link" asp-controller="Home"  asp-action="Index" asp-route-pg="1">First</a>
+                </li>
+                <li>
+                    <a class="page-link" asp-controller="Home"  asp-action="Index" asp-route-pg="@(pagin.CurrentPage-1)">Previous</a>
+                </li>
+            }
+            
+            @for (int i = pagin.StartPage; i < pagin.EndPage; i++)
+            {
+                <li class="page-item @(i==pagin.CurrentPage?"active":"")">
+                    <a class="page-link" asp-controller="Home"  asp-action="Index" asp-route-pg="@i">@i</a>
+                </li>
+            }
+            @if(pagin.CurrentPage<pagin.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Home" asp-action="Index" asp-route-pg="@(pagin.CurrentPage+1)">Next</a>
+                </li>
+                <li>
+                    <a class="page-link" asp-controller="Home" asp-action="Index" asp-route-pg="@(pagin.TotalPages)">Last</a>
+                </li>
+            }
+        </ul>
+    }
+</div>
